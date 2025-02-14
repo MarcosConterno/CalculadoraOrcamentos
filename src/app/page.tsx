@@ -37,7 +37,7 @@ export default function Home() {
   const [fileContent, setFileContent] = useState('');
   const [projectName, setProjectName] = useState('Orçamento de Projeto'); // Nome do projeto
   const [isDictionaryOpen, setIsDictionaryOpen] = useState(false);
-  
+
   const toggleDictionary = () => {
     setIsDictionaryOpen(!isDictionaryOpen);
   };
@@ -64,8 +64,9 @@ export default function Home() {
   }, []);
 
   // Função para adicionar um item com base na ação selecionada
-  const addItem = (event?: React.KeyboardEvent<HTMLSelectElement>) => {
-    if (event && event.key !== "Enter") return; // Apenas adiciona se a tecla pressionada for "Enter"
+  const addItem = (event?: React.KeyboardEvent<HTMLSelectElement> | React.MouseEvent<HTMLButtonElement>) => {
+    // Se for um evento de teclado, verifica se a tecla pressionada foi "Enter"
+    if (event && "key" in event && event.key !== "Enter") return;
 
     const action = predefinedActions.find(action => action.id === Number(selectedAction));
 
@@ -325,6 +326,13 @@ export default function Home() {
     link.download = 'orcamento.json';
     link.click();
   };
+const handleEvent = (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLSelectElement>) => {
+    if ("key" in event) {
+        console.log("Tecla pressionada:", event.key);
+    } else {
+        console.log("Botão clicado");
+    }
+};
 
 
   // Totalizadores
@@ -371,7 +379,7 @@ export default function Home() {
 
       {/* Botões */}
       <div className="flex space-x-4">
-        <button
+        <button 
           onClick={addItem}
           className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none"
         >
