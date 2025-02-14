@@ -14,12 +14,12 @@ const predefinedActions = [
   { id: 6, description: '(RPA) Preencher Campo (cpf, nome, idade, número do processo e etc)', hours: 0.10 },
   { id: 7, description: '(RPA) Ler Campo da tela', hours: 0.1 },
   { id: 8, description: '(RPA) Baixar documento (.pdf, .doc, etc)', hours: 2.0 },
-  { id: 9, description: 'Tem VPN?', hours: 3.0 },
+  { id: 9, description: '(RPA) Clique de Botão', hours: 0.50 },
   { id: 10, description: '(API) Ler Campo da API', hours: 1.0 },
   { id: 11, description: '(API) Preencher campo API', hours: 0.5 },
   { id: 12, description: 'Outra ação não catalogada', hours: 0.0 },
   { id: 13, description: '(API) Estudo completo de API de terceiros', hours: 8.0 },
-  { id: 14, description: '(RPA) Clique de Botão', hours: 4.0 },
+  { id: 14, description: 'Tem VPN?', hours: 3.0 },
   { id: 15, description: 'Aplicação', hours: 0.5 },
 ];
 
@@ -37,6 +37,7 @@ export default function Home() {
   const [fileContent, setFileContent] = useState('');
   const [projectName, setProjectName] = useState('Orçamento de Projeto'); // Nome do projeto
   const [isDictionaryOpen, setIsDictionaryOpen] = useState(false);
+  
   const toggleDictionary = () => {
     setIsDictionaryOpen(!isDictionaryOpen);
   };
@@ -63,7 +64,9 @@ export default function Home() {
   }, []);
 
   // Função para adicionar um item com base na ação selecionada
-  const addItem = () => {
+  const addItem = (event?: React.KeyboardEvent<HTMLSelectElement>) => {
+    if (event && event.key !== "Enter") return; // Apenas adiciona se a tecla pressionada for "Enter"
+
     const action = predefinedActions.find(action => action.id === Number(selectedAction));
 
     if (action) {
@@ -211,7 +214,6 @@ export default function Home() {
       if (line.startsWith('---')) {
         return;
       }
-
       if (line.toLowerCase().includes('primeira tela')) {
         newItems.push({
           description: '(RPA) Navegar para a primeira tela do robo',
@@ -242,7 +244,7 @@ export default function Home() {
           hours: 1.0,
           value: 1.0 * valuePerHour,
         });
-      } else if (line.toLowerCase().includes('insere dados')) {
+      } else if (line.toLowerCase().includes('rpa insere dados')) {
         newItems.push({
           description: '(RPA) Preencher Campo (cpf, nome, idade, número do processo e etc)',
           hours: 0.10,
@@ -271,6 +273,12 @@ export default function Home() {
           description: '(API) Ler Campo da API',
           hours: 1.0,
           value: 1.0 * valuePerHour,
+        });
+      } else if (line.toLowerCase().includes('api autenticacao')) {
+        newItems.push({
+          description: '(API) Autenticação de API',
+          hours: 2.0,
+          value: 2.0 * valuePerHour,
         });
       } else if (line.toLowerCase().includes('api insere dados')) {
         newItems.push({
@@ -329,7 +337,6 @@ export default function Home() {
   return (
     <div className="container mx-auto p-8 bg-gray-50 rounded-lg shadow-xl">
       <h1 className="text-4xl font-extrabold text-center mb-8 text-indigo-600">Sistema de Orçamento de Projetos</h1>
-
       {/* Campo de Nome do Projeto */}
       <div className="mb-6">
         <label htmlFor="project-name" className="block text-lg font-semibold text-gray-700">Nome do Projeto</label>
@@ -344,14 +351,23 @@ export default function Home() {
 
       {/* Seletor de Ações */}
       <div className="mb-6">
-        <label htmlFor="action" className="block text-lg font-semibold text-gray-700">Escolha uma Ação</label>
-        <Select
+        <label htmlFor="action" className="block text-lg font-semibold text-gray-700 mb-2">
+          Escolha uma Ação
+        </label>
+        <select
           id="action"
-          options={actionOptions}
-          onChange={(selectedOption) => setSelectedAction(selectedOption ? String(selectedOption.value) : '')}
-          className="mt-2"
-        />
+          value={selectedAction}
+          onChange={(e) => setSelectedAction(e.target.value)}
+          onKeyDown={addItem}
+          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-black-700"
+        >
+          <option value="" disabled>Selecione uma ação...</option>
+          {predefinedActions.map(action => (
+            <option key={action.id} value={action.id}>{action.description}</option>
+          ))}
+        </select>
       </div>
+
 
       {/* Botões */}
       <div className="flex space-x-4">
